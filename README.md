@@ -1,18 +1,16 @@
-# JAX Derivatives — Black-Scholes Greeks, SVI Calibration, Delta-Hedge Sim
+# JAX derivatives: Black-Scholes Greeks, SVI calibration, delta hedging
 
-Self-contained JAX implementation of three core building blocks of derivatives
+Self-contained JAX implementation of three building blocks of derivatives
 quant work:
 
-1. **Black-Scholes pricer + analytic Greeks**, with a parallel set of
+1. **Black-Scholes pricer with analytic Greeks**, alongside
    **JAX autodiff Greeks** built from the same one-line price function.
 2. **SVI raw-parametrisation implied-variance surface calibration** via
    constrained L-BFGS-B (scipy) on the JAX loss.
 3. **Discrete-time delta-hedging Monte Carlo simulator** quantifying the
-   classical hedge-frequency vs transaction-cost trade-off for a
-   short-call book.
+   hedge-frequency against transaction-cost trade-off for a short-call book.
 
-Built as a self-directed exercise for Summer 2027 quant internship
-applications; lives alongside
+A companion to
 [`crypto-momentum-backtest`](https://github.com/IsaacDodds/crypto-momentum-backtest).
 
 ---
@@ -27,9 +25,8 @@ grid K ∈ [70, 130], spot S = 100, T = 1y, σ = 0.20, r = 0.05:
 
 ![Greeks check](greeks_analytic_vs_autodiff.png)
 
-The point: with autodiff you write the payoff once and get every Greek of
-every order for free. Closed-form Greeks here are only kept as a sanity
-check.
+With autodiff the payoff is written once and every Greek of every order
+follows from it. The closed-form Greeks are kept only as a check.
 
 ### SVI calibration
 Synthetic smile generated from known parameters (a=0.02, b=0.12, ρ=−0.5,
@@ -65,10 +62,10 @@ notional per side. 5,000 GBM paths per frequency.
 
 ![Hedge frequency vs cost](delta_hedge_frequency_cost.png)
 
-The trade-off is textbook: PnL std roughly halves each time rebalance
+The trade-off is the standard one: PnL std roughly halves each time rebalance
 frequency quadruples, while mean cumulative transaction cost rises
-sub-linearly. The sweet spot for this instrument at 1 bp cost is around
-daily rebalancing — beyond that the marginal hedge improvement is paid for
+sub-linearly. For this instrument at 1 bp cost the sweet spot is around
+daily rebalancing. Beyond that the marginal hedge improvement is paid for
 twice over in fees.
 
 ---
@@ -98,16 +95,14 @@ Outputs all three PNGs and `demo_metrics.json` in the repo root.
 
 ## Why JAX
 
-* Same price function pulls quintuple duty (price + 5 Greeks via grad / jacfwd
-  / jacrev) — and the result matches closed-form to machine epsilon.
-* Trivial to scale: vmap across strikes/maturities, jit the hot path.
-* Natural extension path: structured payoffs (basket, barrier, Asian) get
-  Greeks for free once written; calibration losses get gradients for free.
+* The same price function gives the price and five Greeks via grad, jacfwd
+  and jacrev, and the result matches closed form to machine epsilon.
+* Trivial to scale: vmap across strikes and maturities, jit the hot path.
+* Structured payoffs (basket, barrier, Asian) get Greeks for free once
+  written; calibration losses get gradients for free.
 
 ---
 
 ## Author
 
-Isaac Dodds — github.com/IsaacDodds. MSc Advanced Machine Learning, University
-of Bath (predicted Distinction). Built alongside Summer 2027 quant internship
-preparation.
+Isaac Dodds, MSc Advanced Machine Learning, University of Bath.
